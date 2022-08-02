@@ -20,7 +20,7 @@ class TokenService{
             tokenData.refreshToken = refreshToken; //если мы нашли у этого юзера токен мы его перезаписываем
             return tokenData.save();
         }
-        const token = await Token.create({refresh_token: refreshToken}); //если не наши этоо пользователя с токеном создаем для него новую запись
+        const token = await Token.create({refresh_token: refreshToken, userId: userId}); //если не наши этоо пользователя с токеном создаем для него новую запись
         return token;
     }
 }

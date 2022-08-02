@@ -10,11 +10,14 @@ const tokenService = require('./tokenService');
 
 
 class UserService{
+
+
     async registration(email, password){
         const candidate = User.findOne({where: {email: email}});
         if (candidate){
             // throw new Error('Пользователь с таким эмейлом уже есть');
-            console.log('yzhe est')
+            console.log('error')
+            return;
         }
 
         const activateLink = await uuid.v4(); //создаем ссылку для активации пользователя
@@ -28,7 +31,7 @@ class UserService{
         }
 
 
-        // await mailService.sendActivationMail(email, activateLink);
+        await mailService.sendActivationMail(email, `http://localhost:4444/api/activate/${activateLink}`);  //отправляем на почту ссылку с активацией
         const tokens = tokenService.generateTokens(payload);  //ененрируем 2 токена
         await tokenService.saveToken(payload.id, tokens.refreshToken);  //сораняем рефреш токен в БД
 
@@ -38,6 +41,19 @@ class UserService{
             user: payload
         }
     }
+
+
+    async activation(activationLink){
+        const user = User.findOne({where: {activation_link: activationLink}});
+        if (!user){
+            console.log('error');
+            return;
+        }
+        user.is_activated = true;
+        await user.save();
+    }
+
+
 }
 
 module.exports = new UserService();
